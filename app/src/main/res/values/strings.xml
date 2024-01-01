@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Pk Sales Record</string>
+    <string name="title_activity_payment">PaymentActivity</string>
+</resources>
