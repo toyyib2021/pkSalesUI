@@ -25,7 +25,7 @@ fun calculateDaysBetween(
 }
 
 
-fun previousDaysCount(givenDate: String, daysToSubtract: Long): String {
+fun minusDaysFromDate(givenDate: String, daysToSubtract: Long): String {
 
 
     // Parse the given date
@@ -46,8 +46,22 @@ fun previousDaysCount(givenDate: String, daysToSubtract: Long): String {
 
 }
 
+fun addDaysToDate(givenDate: String, daysToAdd: Long): String {
 
-fun futureDaysCount(givenDate: String, monthsToAdd: Long): String {
+    // Parse the given date
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val date = LocalDate.parse(givenDate, formatter)
+
+    // Added days
+    val addedDays = date.plusDays(daysToAdd)
+
+    // Format the result
+    val result = addedDays.format(formatter)
+
+    return result
+}
+
+fun addExtraMonthToDate(givenDate: String, monthsToAdd: Long): String {
 
     // Parse the given date
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -65,3 +79,4 @@ fun futureDaysCount(givenDate: String, monthsToAdd: Long): String {
 
     return result
 }
+

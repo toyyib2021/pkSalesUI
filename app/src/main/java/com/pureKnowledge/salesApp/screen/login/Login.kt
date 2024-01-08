@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,9 +53,12 @@ fun LoginUI(
     emailLabel: String,
     password: String,
     passwordLabel: String,
+    errorMsg: String,
+    loading:Boolean
 ){
     val bgColorsLight = listOf<Color>(TopWhite, BottomWhite)
     val bgColorsDark = listOf<Color>(Black, Black)
+
     Column(modifier = Modifier
         .background(
             if (isSystemInDarkTheme()) {
@@ -65,7 +72,6 @@ fun LoginUI(
             }
         )
         .fillMaxSize()) {
-
 
         Column(modifier = Modifier
             .weight(3.5f)
@@ -81,8 +87,22 @@ fun LoginUI(
                 Spacer(modifier = Modifier.weight(2f))
                 Image(modifier = Modifier.weight(6f), painter = painterResource(id = R.drawable.compatriots_logo),
                     contentDescription = "Logo")
-                Spacer(modifier = Modifier.weight(2f))
+                    Column(modifier = Modifier
+                        .weight(2f), verticalArrangement = Arrangement.Center) {
+                        if (loading){
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(3.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            trackColor = MaterialTheme.colorScheme.secondary,
+                        )
+                    }
+
+                }
+
             }
+
 
         }
         Column(modifier = Modifier.weight(1f),
@@ -99,7 +119,7 @@ fun LoginUI(
                 )
             )
         }
-        LazyColumn(modifier = Modifier.weight(3f)){
+        LazyColumn(modifier = Modifier.weight(5f)){
             item {
                 EditTextAuth(
                     value = email,
@@ -117,14 +137,36 @@ fun LoginUI(
                     onValueChange = { onPasswordChange(it) },
                     keyboardType = KeyboardType.Text
                 )
+
+                Spacer(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp))
+
+                CardTextBtn(btnText = "Login", onBtnClick = {onLoginClick()},
+                    paddingEnd = 20.dp, containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
             }
 
         }
-        Column(modifier = Modifier.weight(2f)) {
-            CardTextBtn(btnText = "Login", onBtnClick = {onLoginClick()},
-                paddingEnd = 20.dp, containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.primary
-            )
+
+        Column(modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (errorMsg.isNotEmpty()){
+                Text(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red)
+                    .padding(vertical = 5.dp),
+                    text = errorMsg, color = Color.White,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+
         }
         Column(
             modifier = Modifier
@@ -146,6 +188,7 @@ fun LoginUI(
 @Composable
 fun LoginPreview(){
     val text by remember { mutableStateOf("") }
+    val loading by remember { mutableStateOf(true) }
     LoginUI(
         onLoginClick = { /*TODO*/ },
         onEmailChange = {},
@@ -154,6 +197,8 @@ fun LoginPreview(){
         emailLabel = "Email",
         password = text,
         passwordLabel ="Password",
-        onSignUpClick = {}
+        onSignUpClick = {},
+        errorMsg = "",
+        loading = loading
     )
 }

@@ -10,8 +10,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pureKnowledge.salesApp.dataStore.DbPinKey
-import com.pureKnowledge.salesApp.dataStore.UserDataKey
+import com.pureKnowledge.salesApp.screen.viewModel.ActivationViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -24,20 +25,23 @@ fun ForgetAccessPinScreen(
     val dbPinKey = DbPinKey(context)
     val dbPin = dbPinKey.getKey.collectAsState(initial = "")
     val dbPinList = dbPin.value.split(",")
-    val pinFromList = dbPinList.firstOrNull()
+//    val pinFromList = dbPinList.firstOrNull()
+    val activationViewModel: ActivationViewModel = viewModel()
+    val activationDBData = activationViewModel.data.value.firstOrNull()
+    val dbActivationCode = activationDBData?.activationKey
     var fullName = dbPinList.lastOrNull()
     var pin by remember { mutableStateOf("") }
     var errorMsg by remember { mutableStateOf("") }
     var confirmPin by remember { mutableStateOf("") }
-    var oldPin by remember { mutableStateOf("") }
+    var activationCode by remember { mutableStateOf("") }
 
     BackHandler() {onBackCLick()}
     ForgetAccessPinUI(
         onContinueClick = {
-            if (oldPin.isNotEmpty()
+            if (activationCode.isNotEmpty()
                 && pin.isNotEmpty() && confirmPin.isNotEmpty()){
-                if (oldPin == pinFromList){
-                    if (pin == ""){
+                if (activationCode == dbActivationCode){
+                    if (pin == confirmPin){
                         scope.launch {
                             dbPinKey.saveKey("$confirmPin,$fullName")
                         }
@@ -46,7 +50,7 @@ fun ForgetAccessPinScreen(
                         errorMsg = "New Pin And Confirm Pin not the same"
                     }
                 }else{
-                    errorMsg = "Incorrect Old Pin"
+                    errorMsg = "Incorrect Activation Code"
                 }
             }else{
                 errorMsg = "You left Some Field Empty"
@@ -60,8 +64,8 @@ fun ForgetAccessPinScreen(
         onFullNameChange =  { fullName = it},
         pin = pin,
         onPinChange = {pin = it},
-        activationCode = oldPin,
-        onActivationCodeChange ={ oldPin = it },
+        activationCode = activationCode,
+        onActivationCodeChange ={ activationCode = it },
         errorMsg = errorMsg
     )
 

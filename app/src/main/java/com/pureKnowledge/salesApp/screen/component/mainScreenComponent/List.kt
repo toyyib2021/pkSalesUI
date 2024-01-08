@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +53,7 @@ fun ProductPriceCard(
     repPrice: String,
     discountPrice: String,
     onPriceClick:()->Unit,
-    bitmap: Painter
+    bitmap: ImageBitmap?
 
 ){
     Row(
@@ -117,7 +114,13 @@ fun ProductPriceCard(
                     containerColor = Color.Transparent
                 )
             ) {
-                Image(modifier = Modifier.fillMaxSize(),painter = bitmap, contentDescription ="product" )
+                if (bitmap == null){
+                    Image(modifier = Modifier.fillMaxSize(),painter = painterResource(id = R.drawable.empty_basket),
+                        contentDescription ="product" )
+
+                }else{
+                    Image(modifier = Modifier.fillMaxSize(), bitmap = bitmap, contentDescription = "bitmap")
+                }
             }
         }
 
@@ -528,7 +531,7 @@ fun PaymentCard(
 
 @Composable
 fun OrderDetailsCard(
-    nameOfPayeer: String,
+    nameOfCustomer: String,
     date: String,
     amount: String,
     onCustomerClick:()->Unit,
@@ -537,24 +540,38 @@ fun OrderDetailsCard(
     balance: String,
     balanceStyle: TextStyle = MaterialTheme.typography.bodySmall,
     amountStyle: TextStyle = MaterialTheme.typography.bodySmall,
-    balanceText: String
+    balanceText: String,
+    dateCreate:String = "",
+    customerType:String = ""
 
 ){
+    var hide by remember { mutableStateOf(false) }
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 10.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(
             modifier = Modifier
                 .weight(5f)
-                .padding(start = 10.dp)
-                .clickable { onCustomerClick() },
+                .padding(start = 10.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            Text(text = nameOfPayeer, style = MaterialTheme.typography.bodySmall, maxLines = 2)
-            Text(text = date, style = MaterialTheme.typography.bodySmall.copy(
+            Text(modifier = Modifier.clickable { onCustomerClick() },
+                text = nameOfCustomer, style = MaterialTheme.typography.bodySmall, maxLines = 2)
+            if(hide){
+                Text( modifier = Modifier.clickable { hide = !hide },
+                text = "$dateCreate / $customerType", style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = FontWeight.Normal
-            ))
+                )
+                )
+            }else{
+                Text( modifier = Modifier.clickable { hide = !hide },
+                    text = date, style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.Normal
+                    )
+                )
+            }
+
         }
 
         Column(
@@ -618,18 +635,18 @@ fun List(){
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(TopWhite)) {
-        ProductPriceCard(
-            productTitle = "Dot-To-Do Number Activity For KG",
-            productType = "Book One",
-            price = "N2,500",
-            repPrice = "N1,000",
-            discountPrice = "N2,000",
-            onPriceClick = {},
-            bitmap = painterResource(id = R.drawable.original),
-            titleDiscount = "Discount",
-            titlePrice = "Price",
-            titleRep = "Rep Price"
-        )
+//        ProductPriceCard(
+//            productTitle = "Dot-To-Do Number Activity For KG",
+//            productType = "Book One",
+//            price = "N2,500",
+//            repPrice = "N1,000",
+//            discountPrice = "N2,000",
+//            onPriceClick = {},
+//            bitmap = ,
+//            titleDiscount = "Discount",
+//            titlePrice = "Price",
+//            titleRep = "Rep Price"
+//        )
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp))
@@ -650,7 +667,7 @@ fun List(){
             .fillMaxWidth()
             .padding(10.dp))
         OrderDetailsCard(
-            nameOfPayeer = "Pure Knowledge Computer",
+            nameOfCustomer = "Pure Knowledge Computer",
             date = "Mon 10 Oct, '23",
             amount = "History",
             onCustomerClick = { /*TODO*/ },

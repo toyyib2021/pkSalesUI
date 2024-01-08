@@ -14,6 +14,10 @@ object Constants {
     const val SEARCH_PRODUCT = "search"
     const val ADDED_PRODUCT = "Added Product"
 
+    // PRODUCT OR SERVICE
+    const val PRODUCT = "Product"
+    const val SERVICE = "Service"
+
     // Navigation Constant
     const val ROOT_GRAPH_ROUTE = "root"
     const val AUTH_GRAPH_ROUTE = "auth"

@@ -23,13 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pureKnowledge.salesApp.screen.component.PinDialog
 import com.pureKnowledge.salesApp.screen.component.bottomSheetComponent.BottomSheet
-import com.pureKnowledge.salesApp.screen.component.cardswigdet.PriceListTitleCard
 import com.pureKnowledge.salesApp.screen.component.cardswigdet.ProductTitleCard
-import com.pureKnowledge.salesApp.screen.component.cardswigdet.RevenueTitleCard
 import com.pureKnowledge.salesApp.screen.component.listHeaders.TextTextIcon
 import com.pureKnowledge.salesApp.screen.component.mainScreenComponent.OrderDetailsCard
 import com.pureKnowledge.salesApp.screen.component.mainScreenComponent.PaymentCard
-import com.pureKnowledge.salesApp.screen.component.titleComponent.TitleMain
 import com.pureKnowledge.salesApp.screen.component.topBarComponent.BasicTopBar
 import com.pureKnowledge.salesApp.screen.order.OrderDetailsUI
 import com.pureKnowledge.salesApp.ui.theme.Black
@@ -226,7 +223,7 @@ fun RevenueMain2(
                 )
                 if (hide) {
                     OrderDetailsCard(
-                        nameOfPayeer = "Pure Knowledge Ltd",
+                        nameOfCustomer = "Pure Knowledge Ltd",
                         date = "Mon 11 Oct, '23",
                         amount = "₦70,000",
                         onCustomerClick = openBottomSheet,

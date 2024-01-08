@@ -69,7 +69,7 @@ fun DebitUI(
             .weight(7f)
         ) {
             OrderDetailsCard(
-                nameOfPayeer = "Pure Knowledge Ltd",
+                nameOfCustomer = "Pure Knowledge Ltd",
                 date = "Mon 11 Oct, ‘23",
                 amount = "₦4,000,000",
                 onCustomerClick = { /*TODO*/ },

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,11 +52,13 @@ fun ActivationUI(
     onCompanyChange:(String)->Unit,
     onActivationCodeChange:(String)->Unit,
     company: String,
+    errorMsg: String,
     activationCode: String,
     freeTrial: Boolean,
     subscriptionSuccessFull: Boolean,
     activationCodeDialog: String,
-    onCardClick:()->Unit
+    onCardClick:()->Unit,
+    activationTextFeild: Boolean
 ){
     var openDialog by remember { mutableStateOf(false) }
 
@@ -86,7 +89,7 @@ fun ActivationUI(
         onFreeTrailClick = onFreeTrailClick,
         subscriptionSuccessFull = subscriptionSuccessFull,
         activationCode = activationCodeDialog,
-        onCardClick = onCardClick
+        onCardClick = onCardClick,
     )
 
     val bgColorsLight = listOf<Color>(TopWhite, BottomWhite)
@@ -106,14 +109,14 @@ fun ActivationUI(
         )
         .fillMaxSize()) {
 
-        var activationTextFeild by remember { mutableStateOf(false) }
+//        var activationTextFeild by remember { mutableStateOf(false) }
         Column(modifier = Modifier
             .weight(1f)
         ) {
            BasicTopBar(onBackCLick = onBackCLick)
         }
         Column(modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center
+//            verticalArrangement = Arrangement.Center
         ) {
             TitleMain(
                  paddingValue = 30.dp ,
@@ -126,7 +129,7 @@ fun ActivationUI(
                 )
             )
         }
-        LazyColumn(modifier = Modifier.weight(3f)){
+        LazyColumn(modifier = Modifier.weight(7f)){
             item {
                 EditTextAuth(
                     value = company,
@@ -160,13 +163,31 @@ fun ActivationUI(
                 } else {
                     CardTextBtn(btnText = "Continue",
                         onBtnClick = {
-                            createActivationCode()
-                            activationTextFeild = true },
+                            createActivationCode() },
                         paddingEnd = 20.dp, containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.primary
                     )
                 }
 
+            }
+
+        }
+
+        Column(modifier = Modifier
+            .weight(1.5f)
+            .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (errorMsg.isNotEmpty()){
+                Text(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red)
+                    .padding(vertical = 5.dp),
+                    text = errorMsg, color = Color.White,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
             }
 
         }
@@ -209,6 +230,8 @@ fun ActivationPreview(){
         createActivationCode ={},
         subscriptionSuccessFull = subscriptionSuccessFull,
         activationCodeDialog = "",
-        onCardClick = {}
+        onCardClick = {},
+        errorMsg = "",
+        activationTextFeild = false
     )
 }

@@ -1,17 +1,22 @@
 package com.pureKnowledge.salesApp.screen.searchCustomer
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -19,6 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pureKnowledge.salesApp.model.Customer
+import com.pureKnowledge.salesApp.navigation.Screen
 import com.pureKnowledge.salesApp.screen.component.bottomSheetComponent.BottomSheet
 import com.pureKnowledge.salesApp.screen.component.cardswigdet.AddAndUpdateBtn
 import com.pureKnowledge.salesApp.screen.component.mainScreenComponent.OrderDetailsCard
@@ -43,12 +50,14 @@ fun SearchCustomerUI(
     onBackCLick:()->Unit,
     value:String,
     onValueChange:(String)->Unit,
-    onSearchClick:()->Unit
-
+    onSearchClick:()->Unit,
+    customerList:List<Customer>,
+    onPlaceOrderClick:(Customer)->Unit,
+    onHistroyClick:(Customer)->Unit,
+    onUpdateCustomerClick:(Customer)->Unit,
 ){
     val bgColorsLight = listOf<Color>(TopWhite, BottomWhite)
     val bgColorsDark = listOf<Color>(Black, Black)
-    var editCustomerState by remember { mutableStateOf(false) }
 
     Column(
         modifier
@@ -87,24 +96,43 @@ fun SearchCustomerUI(
             )
         }
         Column(modifier = Modifier
-            .weight(5.5f)
+            .weight(6.5f)
         ) {
-            OrderDetailsCard(
-                nameOfPayeer = "Pure Knowledge Computer",
-                date = "Mon 10 Oct, '23",
-                amount = "History",
-                onCustomerClick = { editCustomerState = true },
-                onAmountClick = { },
-                onOrderNowClick = { },
-                balance = "Order",
-                balanceText = "Place"
-            )
+            LazyColumn{
+                if (customerList.isEmpty()){
+                    item{
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Transparent),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(painter = painterResource(id = R.drawable.empty_file),
+                                contentDescription = "empty_file")
+                        }
+                    }
+                }else{
+                    items(customerList){
+
+                        OrderDetailsCard(
+                            nameOfCustomer = it.customerName,
+                            date = it.phone,
+                            amount = "History",
+                            onCustomerClick = { onUpdateCustomerClick(it) },
+                            onAmountClick = {onHistroyClick(it) },
+                            onOrderNowClick = { onPlaceOrderClick(it) },
+                            balance = "Order",
+                            balanceText = "Place",
+                            customerType = it.customerType,
+                            dateCreate = it.date
+                        )
+                    }
+                }
+            }
+
         }
-        Column(modifier = Modifier
-            .weight(1f)
-        ) {
-            AddAndUpdateBtn(btnText = "Order", onCardClick = {})
-        }
+
         Column(modifier = Modifier
             .weight(1f)
         ) {
@@ -135,6 +163,10 @@ fun SearchCustomerUIPreview(){
         onBackCLick = { /*TODO*/ },
         value = value,
         onValueChange = { value = it },
-        onSearchClick = { /*TODO*/ }
+        onSearchClick = { /*TODO*/ },
+        customerList = emptyList(),
+        onPlaceOrderClick = {},
+        onHistroyClick = {},
+        onUpdateCustomerClick = {}
     )
 }

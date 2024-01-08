@@ -1,23 +1,31 @@
 package com.pureKnowledge.salesApp.screen.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pureKnowledge.salesApp.screen.component.bottomSheetComponent.BottomSheet
@@ -51,7 +59,14 @@ fun UpdateOrAddCustomerInfo(
     customersAddress:String,
     select:String,
     listOfOption:List<String>,
-    onSelectChange:(String)->Unit
+    onSelectChange:(String)->Unit,
+    onDeleteClick:()->Unit,
+    delete: Boolean,
+    onAddTypeClick: ()-> Unit,
+    onCustomerTypeDeleteClick: (String)-> Unit,
+    add: Boolean,
+    showIcon: Boolean,
+    errorMsg: String,
 ){
     val bgColorsLight = listOf<Color>(TopWhite, BottomWhite)
     val bgColorsDark = listOf<Color>(Black, Black)
@@ -76,36 +91,68 @@ fun UpdateOrAddCustomerInfo(
         ) {
             BasicTopBar(onBackCLick = { onBackCLick() })
         }
+        Column(modifier = Modifier
+            .weight(0.4f)
+            .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (errorMsg.isNotEmpty()){
+                Text(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red)
+                    .padding(vertical = 5.dp),
+                    text = errorMsg, color = Color.White,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+        }
 
         Column(
             modifier = Modifier
-                .weight(8f)
+                .weight(7.6f)
+                .verticalScroll(state = rememberScrollState())
         ) {
-            TopTitleBtn(btnText = title, icon = icon, )
-            Spacer(modifier = Modifier.fillMaxWidth().padding(5.dp))
+            TopTitleBtn(btnText = title, icon = icon, delete = delete, onDeleteClick = onDeleteClick)
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp))
             EditText(
                 label = "Name of customer",
                 value = customersName,
                 onValueChange = {onCustomersNameChange(it)}
             )
-            Spacer(modifier = Modifier.fillMaxWidth().padding(5.dp))
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp))
             EditText(
                 label = "Phone",
                 value = customersPhone,
                 onValueChange = {onCustomersPhoneChange(it)}
             )
-            Spacer(modifier = Modifier.fillMaxWidth().padding(5.dp))
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp))
             EditText(
                 label = "Address",
                 value = customersAddress,
                 onValueChange = {onCustomersAddressChange(it)}
             )
-            Spacer(modifier = Modifier.fillMaxWidth().padding(5.dp))
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp))
 
 
-            Spinner(select = select, listOfOption = listOfOption, onSelectChange = { onSelectChange(it)})
+            Spinner(select = select, listOfOption = listOfOption, onSelectChange = { onSelectChange(it)},
+                add = add, onAddTypeClick = onAddTypeClick, onDeleteClick = { onCustomerTypeDeleteClick(it) },
+                showIcon = showIcon
+            )
 
-            Spacer(modifier = Modifier.fillMaxWidth().padding(5.dp))
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp))
             CardTextBtn(btnText = "Submit", onBtnClick = {onSubmitClick()})
         }
 
@@ -113,10 +160,10 @@ fun UpdateOrAddCustomerInfo(
             .weight(1f)
         ) {
             BottomSheet(
-                onHomeClick = { onHomeClick() },
-                onStockRecordClick = { onStockRecordClick() },
-                onCustomerSearchClick = { onCustomerSearchClick() },
-                onPriceClick = {onPriceClick()},
+                onHomeClick = {  },
+                onStockRecordClick = {  },
+                onCustomerSearchClick = {  },
+                onPriceClick = { },
                 containerColor = HOME
 
             )
@@ -148,6 +195,13 @@ fun CustomerPreview(){
         customersAddress = "",
         select = status,
         listOfOption = customerStatus,
-        onSelectChange = {status=it}
+        onSelectChange = {status=it},
+        onDeleteClick = {},
+        delete  = true,
+        showIcon  = true,
+        add = false,
+        onAddTypeClick = {},
+        onCustomerTypeDeleteClick = {},
+        errorMsg = ""
     )
 }

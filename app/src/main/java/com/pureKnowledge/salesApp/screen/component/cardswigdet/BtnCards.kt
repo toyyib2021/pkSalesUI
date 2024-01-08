@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -78,35 +81,44 @@ fun TopTitleForProductBtn(
     icon: Painter,
     listOfOption: List<String>,
     onSelectChange:(String)->Unit,
-    containerColor: Color = MaterialTheme.colorScheme.secondary
+    onDeleteClick:()->Unit,
+    deleteHide: Boolean
 ){
     Row(
+        modifier = Modifier.fillMaxWidth().padding(5.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        var expanded by remember { mutableStateOf(false) }
 
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = containerColor,
-                contentColor = MaterialTheme.colorScheme.primary
-            ),
-            shape = RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp)
-        ) {
-            Row(
-                modifier = Modifier.padding(start = 15.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(modifier = Modifier.size(30.dp), painter = icon,
-                    contentDescription = "add", tint = MaterialTheme.colorScheme.primary)
-                Spacer(modifier = Modifier.padding(5.dp))
-                Spinner(select = select, listOfOption = listOfOption,
-                    onSelectChange ={onSelectChange(it)},
-                    containerColor =  Color.Transparent,
-                    horizontalArrangement = Arrangement.Start
-                )
-            }
+        Icon(modifier = Modifier
+            .weight(1f).padding(start = 10.dp), painter = icon,
+            contentDescription = "add", tint = MaterialTheme.colorScheme.primary)
+        Spacer(modifier = Modifier.padding(10.dp))
+        Column(modifier = Modifier.weight(7f), horizontalAlignment = Alignment.Start) {
+
+            DropdownSpinnerList(
+                items = listOfOption,
+                select = select,
+                onSelectClick = {
+                    onSelectChange(it)
+                    expanded = false
+                },
+                openDropdown = { expanded = true },
+                expanded = expanded,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                onDismissRequest = {}
+            )
         }
+        Column(modifier = Modifier.weight(2f).padding(end = 10.dp),
+            horizontalAlignment = Alignment.End) {
+            if (deleteHide){
+                Icon(modifier = Modifier.clickable { onDeleteClick() },
+                    imageVector = Icons.Default.Delete, contentDescription ="Delete" )
+            }
+
+        }
+
     }
 }
 
@@ -115,12 +127,14 @@ fun TopTitleForProductBtn(
 fun TopTitleBtn(
     btnText: String,
     icon: Painter,
-    containerColor: Color = MaterialTheme.colorScheme.secondary
+    containerColor: Color = MaterialTheme.colorScheme.secondary,
+    onDeleteClick:()->Unit = {},
+    delete: Boolean = false
 ){
     Row(
         modifier = Modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -147,6 +161,13 @@ fun TopTitleBtn(
             }
 
         }
+        if (delete){
+            Icon(modifier = Modifier
+                .padding(10.dp)
+                .clickable { onDeleteClick() },
+                imageVector = Icons.Default.Delete, contentDescription = "Delete")
+        }
+
     }
 }
 
@@ -228,7 +249,9 @@ fun BtnCardsPreview(){
             select = select ?: "",
             icon = painterResource(id = R.drawable.add),
             listOfOption = productAndService,
-            onSelectChange = {select = it}
+            onSelectChange = {select = it},
+            onDeleteClick = {},
+            deleteHide = true
         )
         Spacer(modifier = Modifier
             .fillMaxWidth()

@@ -1,5 +1,6 @@
 package com.pureKnowledge.salesApp.screen.priceList
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -19,9 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pureKnowledge.salesApp.model.Product
+import com.pureKnowledge.salesApp.screen.component.DeleteDialog
 import com.pureKnowledge.salesApp.screen.component.UpdateOrAddProductPrice
 import com.pureKnowledge.salesApp.screen.component.bottomSheetComponent.BottomSheet
 import com.pureKnowledge.salesApp.screen.component.cardswigdet.CardTextBtn
@@ -34,6 +40,7 @@ import com.pureKnowledge.salesApp.ui.theme.Black
 import com.pureKnowledge.salesApp.ui.theme.BottomWhite
 import com.pureKnowledge.salesApp.ui.theme.TopWhite
 import com.pureKnowledge.salesApp.util.Constants.PRODUCT_LIST
+import com.pureKnowledge.salesApp.util.convertBase64ToBitmap
 import com.pureknowledge.salesApp.R
 
 
@@ -42,7 +49,7 @@ fun PriceListUI(
     modifier: Modifier = Modifier,
     value:String,
     onValueChange:(String)->Unit,
-    onCardClick:()->Unit,
+    onAddClick:()->Unit,
     onSearchClick:()->Unit,
     onHomeClick:()->Unit,
     onStockRecordClick:()->Unit,
@@ -52,7 +59,6 @@ fun PriceListUI(
     onSubmitClick:()->Unit,
     onProductNameChange:(String)->Unit,
     onCategoryChange:(String)->Unit,
-    onProductTypeChange:(String)->Unit,
     onPriceChange:(String)->Unit,
     onRepPriceChange:(String)->Unit,
     onDiscountPriceChange:(String)->Unit,
@@ -61,17 +67,46 @@ fun PriceListUI(
     repPrice:String,
     discountPrice:String,
     category:String,
-    type:String,
-    types:List<String>,
     categories:List<String>,
     productQty: String,
     serviceQty: String,
     onProductClick:()->Unit,
     onServiceClick:()->Unit,
+    productOrService:(String)->Unit,
+    onGetImageFromCamClick:()->Unit,
+    onGetImageFromGalleryClick:()->Unit,
+    imageFromGallery:@Composable () -> Unit,
+    selectType: String,
+    onTypeChange:(String)->Unit,
+    listOfType: List<String>,
+    errorMsg: String,
+    onDownloadClick: ()->Unit,
+    listOfService: List<Product>,
+    listOfProduct: List<Product>,
+    onUpdateServiceClick: (Product)->Unit,
+    onUpdateProductClick: (Product)->Unit,
+    onDeleteClick: ()->Unit,
+    onDeleteDismissRequest:()->Unit,
+    onNoClick:()->Unit,
+    onYesClick:()->Unit,
+    deleteDialog:Boolean,
+    deleteTypeTitle:String,
+    deleteName:String,
+    editPtriceListState: Boolean,
+    onUpdateBackCLick:()->Unit
 ){
     val bgColorsLight = listOf<Color>(TopWhite, BottomWhite)
     val bgColorsDark = listOf<Color>(Black, Black)
-    var editPtriceListState by remember { mutableStateOf(false) }
+//    var editPtriceListState by remember { mutableStateOf(false) }
+
+    DeleteDialog(
+        onDismissRequest = onDeleteDismissRequest,
+        onNoClick = onNoClick,
+        onYesClick = onYesClick,
+        openDialog = deleteDialog,
+        title = deleteTypeTitle,
+        delete = deleteName
+    )
 
     Column(
         modifier
@@ -94,9 +129,11 @@ fun PriceListUI(
             BasicTopBar(onBackCLick = { onBackCLick() })
         }
 
+
+
         if (editPtriceListState){
             UpdateOrAddProductPrice(
-                onBackCLick = {editPtriceListState = false},
+                onBackCLick = onUpdateBackCLick,
                 onHomeClick = onHomeClick,
                 onStockRecordClick = onStockRecordClick,
                 onCustomerSearchClick = onCustomerSearchClick,
@@ -113,10 +150,26 @@ fun PriceListUI(
                 selectCategory = category,
                 listOfCategories = categories,
                 onCategoryChange = {onCategoryChange(it)},
-                selectProductType = type,
-                listOfProductType = types,
-                onProductTypeChange = {onProductTypeChange(it)},
                 titleIcon = painterResource(id = R.drawable.update),
+                productOrService = {productOrService(it)},
+                onGetImageFromGalleryClick =  onGetImageFromGalleryClick ,
+                onGetImageFromCamClick = onGetImageFromCamClick,
+                imageFromGallery = imageFromGallery,
+                onAddCategoryClick = {},
+                onDeleteCategoryClick = {},
+                showIconCategory = false,
+                addCategory = false,
+                addType = false,
+                onAddTypeClick = {},
+                selectType = selectType,
+                onTypeChange ={onTypeChange(it)} ,
+                listOfType = listOfType,
+                showIconType = false,
+                onDeleteTypeClick = {},
+                errorMsg = errorMsg,
+                onDeleteClick = onDeleteClick,
+                deleteHide = true
+
             )
 
 
@@ -128,7 +181,7 @@ fun PriceListUI(
                 var hide by remember { mutableStateOf(false) }
 
                 TitleContentTwo(
-                    title = "Price List", onBtnClick = {},
+                    title = "Price List", onBtnClick = onDownloadClick,
                     icon = painterResource(id = R.drawable.icon_download)
                 )
                 Row(
@@ -167,7 +220,7 @@ fun PriceListUI(
                     EditTextCard(
                         value = value,
                         onValueChange = { onValueChange(it) },
-                        onCardClick = onCardClick,
+                        onCardClick = onAddClick,
                         onSearchClick = onSearchClick
                     )
                 }
@@ -178,67 +231,78 @@ fun PriceListUI(
                 if (hide){
                     // Service
                     TextText(title = "Gown", titleSize = 6f, subTextSize = 4f)
-                    ProductPriceCard(
-                        productTitle = "Cross leg open month",
-                        productType = "Male",
-                        price = "N2,500",
-                        repPrice = "N1,000",
-                        discountPrice = "N2,000",
-                        onPriceClick = {editPtriceListState = true},
-                        bitmap = painterResource(id = R.drawable.original),
-                        titleDiscount = "Discount",
-                        titlePrice = "Price",
-                        titleRep = "Rep Price"
-                    )
-                    Spacer(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(3.dp))
-                    ProductPriceCard(
-                        productTitle = "Cross leg open month",
-                        productType = "Male",
-                        price = "N2,500",
-                        repPrice = "N1,000",
-                        discountPrice = "N2,000",
-                        onPriceClick = {editPtriceListState = true},
-                        bitmap = painterResource(id = R.drawable.original),
-                        titleDiscount = "Discount",
-                        titlePrice = "Price",
-                        titleRep = "Rep Price"
-                    )
+                    LazyColumn{
+                        if (listOfService.isEmpty()){
+                            item{
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Transparent),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(painter = painterResource(id = R.drawable.empty_basket),
+                                        contentDescription = "empty_file")
+                                }
+                            }
+                        }else{
+
+                            items(listOfService){service ->
+                                val bitmap = convertBase64ToBitmap(service.pics)
+                                ProductPriceCard(
+                                    productTitle = service.productName,
+                                    productType = service.type,
+                                    price = service.price,
+                                    repPrice = service.repPrice,
+                                    discountPrice = service.discountPrice,
+                                    onPriceClick = { onUpdateServiceClick(service) },
+                                    bitmap = bitmap?.asImageBitmap(),
+                                    titleDiscount = "Discount",
+                                    titlePrice = "Price",
+                                    titleRep = "Rep Price"
+                                )
+                            }
+                        }
+                    }
+
+
                 }else{
                     // Product
                     TextText(title = "Kindergarten Series", titleSize = 6f, subTextSize = 4f)
-                    ProductPriceCard(
-                        productTitle = "Dot-To-Do Number Activity For KG",
-                        productType = "Book One",
-                        price = "N2,500",
-                        repPrice = "N1,000",
-                        discountPrice = "N2,000",
-                        onPriceClick = {editPtriceListState = true},
-                        bitmap = painterResource(id = R.drawable.original),
-                        titleDiscount = "Discount",
-                        titlePrice = "Price",
-                        titleRep = "Rep Price"
-                    )
-                    Spacer(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(3.dp))
-                    ProductPriceCard(
-                        productTitle = "Dot-To-Do Number Activity For KG",
-                        productType = "Book Two",
-                        price = "N2,500",
-                        repPrice = "N1,000",
-                        discountPrice = "N2,000",
-                        onPriceClick = {editPtriceListState = true},
-                        bitmap = painterResource(id = R.drawable.original),
-                        titleDiscount = "Discount",
-                        titlePrice = "Price",
-                        titleRep = "Rep Price"
-                    )
+                    LazyColumn{
+                        if (listOfProduct.isEmpty()){
+                            item{
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Transparent),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(painter = painterResource(id = R.drawable.empty_basket),
+                                        contentDescription = "empty_file")
+                                }
+                            }
+                        }else{
+
+                            items(listOfProduct){product ->
+                                val bitmap = convertBase64ToBitmap(product.pics)
+                                ProductPriceCard(
+                                    productTitle = product.productName,
+                                    productType = product.type,
+                                    price = product.price,
+                                    repPrice = product.repPrice,
+                                    discountPrice = product.discountPrice,
+                                    onPriceClick = { onUpdateProductClick(product) },
+                                    bitmap = bitmap?.asImageBitmap(),
+                                    titleDiscount = "Discount",
+                                    titlePrice = "Price",
+                                    titleRep = "Rep Price"
+                                )
+                            }
+                        }
+                    }
                 }
-
-
-
             }
 
             Column(modifier = Modifier
@@ -278,7 +342,6 @@ fun PriceListPreview(){
         onSubmitClick = { /*TODO*/ },
         onProductNameChange = {productName = it},
         onCategoryChange = {category = it},
-        onProductTypeChange = {type = it},
         onPriceChange = {productName = it},
         onRepPriceChange = {productName = it},
         onDiscountPriceChange = {productName = it},
@@ -287,16 +350,36 @@ fun PriceListPreview(){
         repPrice = productName,
         discountPrice = productName,
         category = category,
-        type = type,
-        types = types,
         categories = categories,
         productQty = "80",
         serviceQty = "70",
         onProductClick = { /*TODO*/ },
         onServiceClick = { /*TODO*/ },
         onSearchClick = {},
-        onCardClick = {},
+        onAddClick = {},
         onValueChange = {productName = it},
-        value = productName
+        value = productName,
+        productOrService = {},
+        onGetImageFromGalleryClick = {},
+        onGetImageFromCamClick = {},
+        imageFromGallery = {},
+        selectType = "",
+        onTypeChange ={} ,
+        listOfType = emptyList(),
+        errorMsg = "",
+        onDownloadClick = {},
+        listOfProduct = emptyList(),
+        listOfService = emptyList(),
+        onUpdateProductClick = {},
+        onUpdateServiceClick = {},
+        onDeleteClick = {},
+        onDeleteDismissRequest = {},
+        onNoClick = {},
+        onYesClick = {},
+        deleteDialog = true,
+        deleteTypeTitle = "",
+        deleteName = "",
+        onUpdateBackCLick ={},
+        editPtriceListState = true
     )
 }

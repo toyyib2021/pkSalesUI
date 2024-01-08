@@ -90,7 +90,7 @@ fun OrderListUI(
             TextTextIcon(ondownloadClick = ondownloadClick,
                 subText = "₦70,0000", title ="Mon 11 Oct, '23" )
             OrderDetailsCard(
-                nameOfPayeer = "Pure Knowledge Ltd",
+                nameOfCustomer = "Pure Knowledge Ltd",
                 date = "Mon 1 Oct, '23",
                 amount = "₦700,000",
                 onCustomerClick = { /*TODO*/ },

@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,9 +52,11 @@ fun SignUpUI(
     companyName: String,
     onCompanyNameChange:(String)->Unit,
     password: String,
+    errorMsg: String,
     onPasswordChange:(String)->Unit,
     confirmPassword: String,
     onConfirmPasswordChange:(String)->Unit,
+    loading: Boolean
 
     ){
     val bgColorsLight = listOf<Color>(TopWhite, BottomWhite)
@@ -81,6 +86,14 @@ fun SignUpUI(
         Column(modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
+            if (loading){
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    trackColor = MaterialTheme.colorScheme.secondary,
+                )
+                Spacer(modifier = Modifier.fillMaxWidth().padding(10.dp))
+            }
             TitleMain(
                  paddingValue = 30.dp ,
                 title = "Create An Account",
@@ -89,9 +102,11 @@ fun SignUpUI(
                 ),
             )
         }
-        LazyColumn(modifier = Modifier.weight(7.5f)){
-            item {
 
+        LazyColumn(modifier = Modifier.weight(7.5f)){
+
+
+            item {
                 EditTextAuth(
                     value = fullName,
                     label = "Full Name",
@@ -149,6 +164,25 @@ fun SignUpUI(
             }
 
         }
+
+        Column(modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (errorMsg.isNotEmpty()){
+                Text(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Red)
+                    .padding(vertical = 5.dp),
+                    text = errorMsg, color = Color.White,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+        }
         Column(
             modifier = Modifier
                 .weight(0.5f)
@@ -169,6 +203,7 @@ fun SignUpUI(
 @Composable
 fun LoginPreview(){
     val text by remember { mutableStateOf("") }
+    val loading by remember { mutableStateOf(true) }
     SignUpUI(
         onSignUpClick = { /*TODO*/ },
         onSignInClick = { /*TODO*/ },
@@ -182,6 +217,8 @@ fun LoginPreview(){
         password = text,
         onPasswordChange = {},
         confirmPassword = text,
-        onConfirmPasswordChange ={}
+        onConfirmPasswordChange ={},
+        errorMsg = "",
+        loading = loading
     )
 }

@@ -41,23 +41,15 @@ import com.pureKnowledge.salesApp.ui.theme.TopWhite
 
 @Composable
 fun AccessPinUI(
-    onContinueClick:()->Unit,
-    onBackCLick:()->Unit,
     onForgetPinClick:()->Unit,
-    confirmPin: String,
-    onConfirmPinChange:(String)->Unit,
-    fullName: String,
-    onFullNameChange:(String)->Unit,
-    pin: String,
-    onPinChange:(String)->Unit,
     dbPin:String,
     onContinueClickPin:()->Unit,
     onChangePinClickPin:()->Unit,
+    createPin:()->Unit,
     fullNamePin: String,
     onFullNameChangePin:(String)->Unit,
     pinPin: String,
     errorMsg: String,
-    pinCreationErrorMsg: String,
     onPinChangePin:(String)->Unit,
     expiringDateCount: String
 ){
@@ -77,32 +69,18 @@ fun AccessPinUI(
         )
         .fillMaxSize()) {
 
-        if (dbPin.isNotEmpty()){
-            AccessPin(
-                onContinueClickPin = onContinueClickPin,
-                onChangePinClickPin = onChangePinClickPin,
-                fullNamePin = fullNamePin,
-                onFullNameChangePin = { onFullNameChangePin(it) } ,
-                pinPin = pinPin,
-                onPinChangePin = {onPinChangePin(it)},
-                onForgetPinClick = onForgetPinClick,
-                expiringDateCount = expiringDateCount,
-                errorMsg = errorMsg
-            )
-        }else{
-            CreateAccessPin(
-                onContinueClick = onContinueClick,
-                onBackCLick = onBackCLick,
-                confirmPin = confirmPin,
-                onConfirmPinChange = { onConfirmPinChange(it) },
-                fullName = fullName,
-                onFullNameChange = { onFullNameChange(it) },
-                pin = pin,
-                onPinChange = { onPinChange(it) },
-                pinCreationErrorMsg = pinCreationErrorMsg
-            )
-        }
-
+        AccessPin(
+            onContinueClickPin = onContinueClickPin,
+            onChangePinClickPin = { if (dbPin.isNotEmpty()) onChangePinClickPin() else createPin()},
+            fullNamePin = fullNamePin,
+            onFullNameChangePin = { onFullNameChangePin(it) } ,
+            pinPin = pinPin,
+            onPinChangePin = {onPinChangePin(it)},
+            onForgetPinClick = onForgetPinClick,
+            expiringDateCount = expiringDateCount,
+            errorMsg = errorMsg,
+            titleBarText = if (dbPin.isNotEmpty()) "Change Pin" else "Create Pin"
+        )
     }
 }
 
@@ -117,7 +95,8 @@ fun AccessPin(
     pinPin: String,
     errorMsg: String,
     onPinChangePin:(String)->Unit,
-    expiringDateCount: String
+    expiringDateCount: String,
+    titleBarText: String,
 ){
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -126,7 +105,8 @@ fun AccessPin(
             .fillMaxSize()
 
         ) {
-            TopBarWithText(text = "Change Pin", onChangePinClick = onChangePinClickPin)
+
+            TopBarWithText(text = titleBarText, onChangePinClick = onChangePinClickPin)
 
         }
 
@@ -237,7 +217,22 @@ fun CreateAccessPin(
     pinCreationErrorMsg: String,
     onPinChange:(String)->Unit,
 ){
-    Column(modifier = Modifier.fillMaxSize()) {
+    val bgColorsLight = listOf<Color>(TopWhite, BottomWhite)
+    val bgColorsDark = listOf<Color>(Black, Black)
+
+    Column(modifier = Modifier.fillMaxSize()
+        .background(
+            if (isSystemInDarkTheme()) {
+                Brush.linearGradient(bgColorsDark, start = Offset.Zero, end = Offset.Zero)
+            } else {
+                Brush.linearGradient(
+                    bgColorsLight,
+                    start = Offset.Zero,
+                    end = Offset(100f, 100f)
+                )
+            }
+        )
+    ) {
         Column(modifier = Modifier
             .weight(1f)
             .fillMaxSize()
@@ -327,14 +322,6 @@ fun AccessPinPreview(){
     var confirmPin by remember { mutableStateOf("") }
 
     AccessPinUI(
-        onContinueClick = { /*TODO*/ },
-        onBackCLick = { /*TODO*/ },
-        confirmPin = confirmPin,
-        onConfirmPinChange = { confirmPin = it },
-        fullName = fullName,
-        onFullNameChange = {fullName = it },
-        pin = pin,
-        onPinChange = {pin = it},
         dbPin ="0" ,
         onContinueClickPin = { /*TODO*/ },
         onChangePinClickPin = { /*TODO*/ },
@@ -345,6 +332,6 @@ fun AccessPinPreview(){
         onForgetPinClick = { /*TODO*/ },
         expiringDateCount = "w",
         errorMsg = "",
-        pinCreationErrorMsg = ""
+        createPin = {}
     )
 }

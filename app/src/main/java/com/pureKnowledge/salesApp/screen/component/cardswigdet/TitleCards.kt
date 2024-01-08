@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -600,14 +602,10 @@ fun ProductTitleCard(
 @Composable
 fun CustomersTitleCard(
     totalNumberOfCustomer: String,
-    schools:String,
-    schoolsNO:String,
-    reps:String,
-    repsNo:String,
-    publishers:String,
-    publishersNo:String,
-    others:String,
-    othersNo:String,
+    customerType: List<String>,
+    customerTypeCount: List<String>,
+    onCustomerTypeClick:(String)->Unit
+
 ){
     Row(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.weight(5f)) {
@@ -651,14 +649,19 @@ fun CustomersTitleCard(
                     containerColor = MaterialTheme.colorScheme.secondary
                 )
             ) {
-                Column(modifier = Modifier
-                    .verticalScroll(state = rememberScrollState())
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, bottom = 10.dp)) {
-                    CustomerCountsByType(customerType = schools, customerNumber = schoolsNO )
-                    CustomerCountsByType(customerType = reps, customerNumber =repsNo )
-                    CustomerCountsByType(customerType = publishers, customerNumber =publishersNo )
-                    CustomerCountsByType(customerType = others, customerNumber = othersNo )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    items(customerType){type ->
+                        val typeCount = customerTypeCount.filter { it == type }
+                        CustomerCountsByType(
+                            customerType = type, customerNumber = typeCount.size.toString(),
+                            onCardClick = {onCustomerTypeClick(type)}
+                        )
+                    }
                 }
 
             }
@@ -857,11 +860,12 @@ fun PriceListTitleCard(
 @Composable
 fun CustomerCountsByType(
     customerType: String,
-    customerNumber: String
+    customerNumber: String,
+    onCardClick: () -> Unit
 ){
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().clickable { onCardClick() }
             .padding(top = 5.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -903,14 +907,9 @@ fun TitleCardsPreview(){
         ) {
             CustomersTitleCard(
                 totalNumberOfCustomer = "200",
-                schools = "School",
-                schoolsNO = "2000",
-                reps = "Reps",
-                repsNo = "2000",
-                publishers = "Publisher",
-                publishersNo = "2000",
-                others = "Others",
-                othersNo ="2000"
+                customerType = emptyList(),
+                customerTypeCount = emptyList(),
+                onCustomerTypeClick = {}
             )
         }
 

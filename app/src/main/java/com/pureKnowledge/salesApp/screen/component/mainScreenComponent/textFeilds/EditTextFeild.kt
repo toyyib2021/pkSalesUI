@@ -188,6 +188,7 @@ fun EditTextRectangleCard(
     onValueChange:(String)->Unit,
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.onPrimary,
+    keyboardType: KeyboardType = KeyboardType.Number
 ){
 
         TextField(
@@ -206,7 +207,7 @@ fun EditTextRectangleCard(
                 unfocusedIndicatorColor = Color.Transparent
             ),
             textStyle = MaterialTheme.typography.bodyMedium,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
 
         )
 
@@ -248,6 +249,7 @@ fun EditTextCard(
                 Icon(modifier = Modifier.clickable { onSearchClick() },
                     imageVector = Icons.Default.Search, contentDescription = "Search")
             },
+            maxLines = 1
         )
 //        Spacer(modifier = Modifier.padding(5.dp))
 
@@ -326,7 +328,9 @@ fun DiscountEditText(
 fun EditText(
     label: String,
     value: String,
-    onValueChange:(String)->Unit
+    onValueChange:(String)->Unit,
+    maxLines: Int = 2,
+    keyboardType: KeyboardType = KeyboardType.Text
 
 ){
     TextField(
@@ -341,7 +345,9 @@ fun EditText(
             containerColor = MaterialTheme.colorScheme.onPrimary,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
-        )
+        ),
+        maxLines = maxLines,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
     )
 
 }

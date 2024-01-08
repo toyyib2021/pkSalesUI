@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pureKnowledge.salesApp.screen.component.bottomSheetComponent.BottomSheet
 import com.pureKnowledge.salesApp.screen.component.cardswigdet.DashboardCard
@@ -30,15 +31,16 @@ import com.pureKnowledge.salesApp.util.Constants.HOME
 fun Dashboard(
     onHomeClick:()->Unit,
     onPriceClick:()->Unit,
-    onStockRecordClick:()->Unit,    onCustomerSearchClick:()->Unit,
-    onBackCLick:()->Unit,
+    onStockRecordClick:()->Unit, onCustomerSearchClick:()->Unit,
+    onMenuCLick:()->Unit,
     orders:String, product:String, revenue:String, customer:String,
     onOrderClick:()->Unit, onCustomerClick:()->Unit, onProductClick:()->Unit,
     onRevenueClick:()->Unit, onTextClick:()->Unit
 
 ){
+
     BackHandler() {
-        onBackCLick()
+        onMenuCLick()
     }
     val bgColorsLight = listOf<Color>(TopWhite, BottomWhite)
     val bgColorsDark = listOf<Color>(Black, Black)
@@ -59,7 +61,7 @@ fun Dashboard(
         Column(modifier = Modifier
             .weight(1f)
             .fillMaxWidth()) {
-            BasicTopBar(icon = Icons.Default.Menu, onBackCLick = {onBackCLick()})
+            BasicTopBar(icon = Icons.Default.Menu, onBackCLick = {onMenuCLick()})
         }
         Column(modifier = Modifier
             .weight(6f)
@@ -76,7 +78,7 @@ fun Dashboard(
             .fillMaxWidth()) {
             TitleContent(title = "Debit", onTextClick = onTextClick)
             OrderDetailsCard(
-                nameOfPayeer = "Pure Knowledge Computer",
+                nameOfCustomer = "Pure Knowledge Computer",
                 date = "07030857693",
                 amount = "N20,000",
                 onCustomerClick = { /*TODO*/ },
@@ -100,4 +102,26 @@ fun Dashboard(
         }
 
     }
+}
+
+@Preview
+@Composable
+fun DashboardPreview(){
+
+    Dashboard(
+        onHomeClick = { /*TODO*/ },
+        onPriceClick = { /*TODO*/ },
+        onStockRecordClick = { /*TODO*/ },
+        onCustomerSearchClick = { /*TODO*/ },
+        onMenuCLick = { /*TODO*/ },
+        orders = "20",
+        product = "50",
+        revenue = "1,000,000",
+        customer = "100",
+        onOrderClick = { /*TODO*/ },
+        onCustomerClick = { /*TODO*/ },
+        onProductClick = { /*TODO*/ },
+        onRevenueClick = { /*TODO*/ },
+        onTextClick = { /*TODO*/ }
+    )
 }

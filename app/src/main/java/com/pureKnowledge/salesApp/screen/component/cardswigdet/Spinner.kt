@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -42,7 +43,7 @@ fun DropdownSpinnerList(
     horizontalArrangement: Arrangement.Horizontal
 ) {
 
-    Column {
+    Column() {
         Row(
             modifier = Modifier
 //                .fillMaxWidth()
@@ -59,7 +60,9 @@ fun DropdownSpinnerList(
 
         // DropdownMenu to show the list of items when expanded is true
         DropdownMenu(
-            modifier = Modifier.fillMaxWidth().background(TopWhite),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(TopWhite),
             expanded = expanded,
             onDismissRequest = { onDismissRequest() }
         ) {
@@ -83,10 +86,15 @@ fun DropdownSpinnerList(
 @Composable
 fun Spinner(
     select: String,
+    addText: String = "Add New Type",
     listOfOption: List<String>,
     onSelectChange:(String)->Unit,
     containerColor: Color = MaterialTheme.colorScheme.onPrimary,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceBetween
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceBetween,
+    onAddTypeClick:()->Unit = {},
+    add: Boolean = false,
+    showIcon: Boolean = true,
+    onDeleteClick:(String)->Unit = {}
 ){
     var listState by remember { mutableStateOf(false) }
     Card(
@@ -105,18 +113,40 @@ fun Spinner(
 //                .height(100.dp).fillMaxWidth()
             ) {
                 listOfOption.forEach {
-                    Column(modifier = Modifier
+                    Row(modifier = Modifier
                         .padding(start = 20.dp)
                     ) {
                         Text(modifier = Modifier
-                            .fillMaxWidth()
+                            .weight(8f)
                             .padding(10.dp)
                             .clickable {
                                 listState = false
                                 onSelectChange(it)
-                            }, text = it, style = MaterialTheme.typography.titleMedium)
-                    }
+                            },
+                            text = it, style = MaterialTheme.typography.titleMedium)
+                        Column(modifier = Modifier
+                            .clickable { onDeleteClick(it) }
+                            .weight(2f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            if (showIcon){
+                                Icon(
+                                    imageVector = Icons.Default.Delete, contentDescription = "Delete"
+                                )
+                            }
 
+                        }
+
+                    }
+                }
+
+                if (add){
+                    Text(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, top = 10.dp, bottom = 10.dp)
+                        .clickable { onAddTypeClick() },
+                        text = addText, style = MaterialTheme.typography.bodyLarge,
+                    )
                 }
             }
 
